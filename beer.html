@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Пивко?</title>
+<style>
+:root{--bg:#fff6dd;--fg:#3b2605;--card:#ffffff;--accent:#f0a000;--muted:#7a5a1e;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#1b1204;--fg:#ffefc2;--card:#2a1c07;--accent:#ffb62e;--muted:#d1ad66}}
+:root[data-theme="dark"]{--bg:#1b1204;--fg:#ffefc2;--card:#2a1c07;--accent:#ffb62e;--muted:#d1ad66}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.card{background:var(--card);border-radius:24px;padding:28px 22px;width:min(92%,380px);text-align:center;box-shadow:0 10px 40px rgba(240,160,0,.22);min-height:340px}
+.big{font-size:68px;display:inline-block;animation:clink 1.4s ease-in-out infinite}
+@keyframes clink{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg) scale(1.1)}}
+h1{font-size:24px;margin:10px 0 8px}
+p{color:var(--muted);font-size:16px;line-height:1.45;margin:0 0 22px}
+.btns{display:flex;gap:12px;justify-content:center;align-items:center;min-height:56px}
+button{font:inherit;font-size:17px;font-weight:600;border:0;border-radius:14px;padding:14px 26px;cursor:pointer}
+#yes{background:var(--accent);color:#2a1800}
+#no{background:transparent;color:var(--muted);border:1.5px solid var(--muted)}
+#no.run{position:fixed}
+.done{display:none}
+.done.show{display:block}
+.ask.hide{display:none}
+.float{position:fixed;font-size:28px;pointer-events:none;animation:up 2.4s ease-out forwards}
+@keyframes up{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-70vh)}}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="ask" id="ask">
+    <div class="big">🍺</div>
+    <h1>Слышь, есть дело</h1>
+    <p>Погнали пить пивко? Я угощаю, ты только приходи.</p>
+    <div class="btns">
+      <button id="yes">Погнали 🍻</button>
+      <button id="no">Не</button>
+    </div>
+  </div>
+  <div class="done" id="done">
+    <div class="big">🍻</div>
+    <h1>Заебись!</h1>
+    <p>Договорились. Пиши, когда и где, я уже готов.</p>
+  </div>
+</div>
+<script>
+(function(){
+  var tg = window.Telegram && window.Telegram.WebApp;
+  try{ if(tg){ tg.ready(); tg.expand(); } }catch(e){}
+  var yes = document.getElementById('yes'), no = document.getElementById('no');
+  var lines = ['Не-не, промахнулся','Ты чё, серьёзно?','Ну пожалуйста 🥺','Там же холодненькое','Не поймаешь!'];
+  var n = 0;
+  function dodge(e){
+    if(e) e.preventDefault();
+    no.classList.add('run');
+    var w = window.innerWidth - no.offsetWidth - 16, h = window.innerHeight - no.offsetHeight - 16;
+    no.style.left = Math.max(8, Math.random()*w) + 'px';
+    no.style.top = Math.max(8, Math.random()*h) + 'px';
+    no.textContent = lines[n++ % lines.length];
+  }
+  no.addEventListener('mouseenter', dodge);
+  no.addEventListener('touchstart', dodge, {passive:false});
+  no.addEventListener('click', dodge);
+  yes.addEventListener('click', function(){
+    document.getElementById('ask').classList.add('hide');
+    document.getElementById('done').classList.add('show');
+    for(var i=0;i<24;i++){
+      var s = document.createElement('div');
+      s.className = 'float';
+      s.textContent = ['🍺','🍻','🫧','🥨'][i%4];
+      s.style.left = (Math.random()*95) + 'vw';
+      s.style.top = (60 + Math.random()*35) + 'vh';
+      s.style.animationDelay = (Math.random()*0.8) + 's';
+      document.body.appendChild(s);
+    }
+    try{ if(tg){ tg.HapticFeedback.notificationOccurred('success'); } }catch(e){}
+  });
+})();
+</script>
+</body>
+</html>
